@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::io::{BufRead, BufReader};
 
 use advent::AdventResult;
 
