@@ -3,9 +3,9 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use advent::AdventError;
+use advent::AdventResult;
 
-fn input_parse(input: &[u8]) -> Result<Vec<i32>, AdventError> {
+fn input_parse(input: &[u8]) -> AdventResult<Vec<i32>> {
     let mut reader = BufReader::new(input);
     let mut buf = String::new();
     let mut input = vec![];
@@ -65,7 +65,7 @@ fn part_two(measurements: &[i32]) -> i32 {
     counter
 }
 
-fn main() -> Result<(), AdventError> {
+fn main() -> AdventResult<()> {
     println!("Advent of Code 2021! Rust edition. Day 1");
     let input = include_bytes!("../../day1.txt");
     let measurements = input_parse(input)?;

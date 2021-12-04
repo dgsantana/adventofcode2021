@@ -1,6 +1,6 @@
 use std::io::{BufRead, BufReader};
 
-use advent::AdventError;
+use advent::{AdventError, AdventResult};
 
 #[derive(Debug)]
 enum Command {
@@ -23,7 +23,7 @@ impl Position {
     }
 }
 
-fn command_parser(input: &[u8]) -> Result<Vec<Command>, AdventError> {
+fn command_parser(input: &[u8]) -> AdventResult<Vec<Command>> {
     let mut input = BufReader::new(input);
     let mut buffer = String::new();
     let mut commands = vec![];
@@ -60,18 +60,23 @@ fn determine_position(commands: &[Command]) -> Position {
             Command::Forward(amount) => {
                 pos.depth += pos.aim * amount;
                 pos.horizontal += amount;
-            },
+            }
             Command::Unknown => println!("Invalid command"),
         }
     }
     pos
 }
 
-fn main() -> Result<(), AdventError> {
+fn main() -> AdventResult<()> {
     let input = include_bytes!("../../day2.txt");
     let commands = command_parser(input)?;
     let pos = determine_position(&commands);
-    println!("Horizontal position is {} and depth is {} with a factor of {}", pos.horizontal, pos.depth, pos.factor());
+    println!(
+        "Horizontal position is {} and depth is {} with a factor of {}",
+        pos.horizontal,
+        pos.depth,
+        pos.factor()
+    );
     Ok(())
 }
 
@@ -81,7 +86,7 @@ mod test {
 
     #[test]
     fn validate() {
-        let input=b"forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2";
+        let input = b"forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2";
         let commands = command_parser(input).expect("invalid input data.");
         let pos = determine_position(&commands);
         assert_eq!(pos.horizontal, 15);

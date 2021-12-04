@@ -9,3 +9,5 @@ pub enum AdventError {
     #[error(transparent)]
     IntParseError(#[from] std::num::ParseIntError),
 }
+
+pub type AdventResult<T> = Result<T, AdventError>;

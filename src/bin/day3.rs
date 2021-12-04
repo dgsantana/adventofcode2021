@@ -1,6 +1,6 @@
 use std::io::{BufRead, BufReader, Read};
 
-use advent::AdventError;
+use advent::{AdventError, AdventResult};
 
 #[derive(Debug, Default)]
 struct Partition<'a> {
@@ -52,7 +52,7 @@ fn get_gamma_epsilon(input: &[u8]) -> (i32, i32) {
     (upper, lower)
 }
 
-fn get_rating(input: &[u8], o2_or_co2: bool) -> Result<i32, AdventError> {
+fn get_rating(input: &[u8], o2_or_co2: bool) -> AdventResult<i32> {
     let mut input = BufReader::new(input);
     let mut buffer = String::new();
     input.read_to_string(&mut buffer)?;
@@ -90,7 +90,7 @@ fn get_rating(input: &[u8], o2_or_co2: bool) -> Result<i32, AdventError> {
     Ok(o2_rating)
 }
 
-fn main() -> Result<(), AdventError> {
+fn main() -> AdventResult<()> {
     let input = include_bytes!("../../day3.txt");
     let (gamma, epsilon) = get_gamma_epsilon(input);
     println!(
