@@ -153,7 +153,6 @@ impl Grid {
         self.accumulator.iter().filter(|(_, &v)| v >= 2).count() as u32
     }
 
-    #[allow(dead_code)]
     fn draw_lines_data(&self) {
         for line in &self.lines {
             print!("{} [", &line);
@@ -164,7 +163,6 @@ impl Grid {
         }
     }
 
-    #[allow(dead_code)]
     fn draw_grid(&self) {
         for y in 0..=self.size.1 {
             for x in 0..=self.size.0 {
