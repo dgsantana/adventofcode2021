@@ -306,6 +306,15 @@ mod tests {
     }
 
     #[test]
+    fn validate_last_winner() {
+        let mut bingo = Bingo::parse(SAMPLE_ROW.as_bytes()).expect("Invalid data");
+        bingo.rank_winners();
+        let result = bingo.last_winner().unwrap();
+        let winner = result.winner.as_ref().unwrap();
+        assert_eq!(winner.0, 1924);
+    }
+
+    #[test]
     fn validate_column_winner() {
         let mut bingo = Bingo::parse(SAMPLE_COLUMN.as_bytes()).expect("Invalid data");
         bingo.rank_winners();
