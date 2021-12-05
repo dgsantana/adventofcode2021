@@ -55,10 +55,8 @@ impl LineSegment {
     ///
     /// [Wikipedia](https://en.wikipedia.org/wiki/Bresenham's_line_algorithm)
     fn bresenham_line_points(&self) -> Vec<Point> {
-        let dx = (self.p2.x as i32 - self.p1.x as i32).abs();
-        let sx = if self.p1.x < self.p2.x { 1 } else { -1 };
-        let dy = -(self.p2.y as i32 - self.p1.y as i32).abs();
-        let sy = if self.p1.y < self.p2.y { 1 } else { -1 };
+        let dx = (self.p2.x as i64 - self.p1.x as i64).abs();
+        let dy = -(self.p2.y as i64 - self.p1.y as i64).abs();
         let mut err = dx + dy;
         let mut x = self.p1.x;
         let mut y = self.p1.y;
@@ -72,7 +70,7 @@ impl LineSegment {
             let e2 = 2 * err;
             if e2 >= dy {
                 err += dy;
-                if sx > 0 {
+                if self.p1.x < self.p2.x {
                     x += 1;
                 } else {
                     x -= 1;
@@ -80,7 +78,7 @@ impl LineSegment {
             }
             if e2 <= dx {
                 err += dx;
-                if sy > 0 {
+                if self.p1.y < self.p2.y {
                     y += 1;
                 } else {
                     y -= 1;
@@ -208,6 +206,10 @@ fn line_parser(input: &[u8], orthogonal: bool) -> Grid {
                     }
                 })
                 .collect::<Vec<Point>>();
+            if points.len() != 2 {
+                println!("Invalid line '{}'.", &clean_buffer);
+                continue;
+            }
             let line = LineSegment::new(points[0], points[1]);
             if orthogonal {
                 grid.insert_line_ortogonal_trace(line);
