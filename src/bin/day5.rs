@@ -98,10 +98,10 @@ struct Grid {
 }
 
 impl Grid {
-    fn insert_line_ortogonal_trace(&mut self, line: LineSegment) {
+    fn insert_line_orthogonal_trace(&mut self, line: LineSegment) {
         self.size.0 = self.size.0.max(line.p1.x).max(line.p2.x);
         self.size.1 = self.size.1.max(line.p1.y).max(line.p2.y);
-        self.trace_ortogonal_lines(&line);
+        self.trace_orthogonal_lines(&line);
         self.lines.push(line);
     }
 
@@ -112,7 +112,7 @@ impl Grid {
         self.lines.push(line);
     }
 
-    fn trace_ortogonal_lines(&mut self, line: &LineSegment) {
+    fn trace_orthogonal_lines(&mut self, line: &LineSegment) {
         if line.p1.x == line.p2.x {
             let x = line.p1.x;
             let ymin = line.p1.y.min(line.p2.y);
@@ -126,9 +126,9 @@ impl Grid {
         }
         if line.p1.y == line.p2.y {
             let y = line.p1.y;
-            let xmin = line.p1.x.min(line.p2.x);
-            let xmax = line.p1.x.max(line.p2.x);
-            for x in xmin..=xmax {
+            let x_min = line.p1.x.min(line.p2.x);
+            let x_max = line.p1.x.max(line.p2.x);
+            for x in x_min..=x_max {
                 self.accumulator
                     .entry(Point { x, y })
                     .and_modify(|v| *v += 1)
@@ -212,7 +212,7 @@ fn line_parser(input: &[u8], orthogonal: bool) -> Grid {
             }
             let line = LineSegment::new(points[0], points[1]);
             if orthogonal {
-                grid.insert_line_ortogonal_trace(line);
+                grid.insert_line_orthogonal_trace(line);
             } else {
                 grid.insert_line(line);
             }
@@ -248,7 +248,7 @@ mod tests {
     use crate::{line_parser, SAMPLE};
 
     #[test]
-    fn validate_overlaps_ortogonal() {
+    fn validate_overlaps_orthogonal() {
         let input = SAMPLE.as_bytes();
         let grid = line_parser(input, true);
         assert_eq!(grid.overlaps(), 5);
