@@ -87,15 +87,15 @@ mod tests {
 
     #[test]
     fn lazy_growth() {
-        let latern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
-        let count = growth_lazy(&latern_fish, 80);
+        let lantern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
+        let count = growth_lazy(&lantern_fish, 80);
         assert_eq!(count, 5934);
     }
 
     #[test]
     fn fast_growth() {
-        let latern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
-        let count = growth(&latern_fish, 256);
+        let lantern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
+        let count = growth(&lantern_fish, 256);
         assert_eq!(count, 26984457539);
     }
 }
