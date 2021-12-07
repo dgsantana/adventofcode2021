@@ -63,8 +63,10 @@ fn calculate_fuel_part2(positions: &[u64]) -> AdventResult<(u64, u64)> {
     for pos in min..=max {
         let fuel: u64 = positions
             .iter()
-            .map(|&v| if v > pos { v - pos } else { pos - v })
-            .map(|v| (1..=v).sum::<u64>())
+            .map(|&v| {
+                let n = if v > pos { v - pos } else { pos - v };
+                n * (n + 1) / 2
+            })
             .sum();
         if fuel < fuel_cost {
             fuel_cost = fuel;
@@ -88,6 +90,7 @@ fn main() -> AdventResult<()> {
         "Total fuel cost is {} at position {}",
         fuel_cost, best_position
     );
+
     println!();
     let (fuel_cost, best_position) = timed_run!("Part 2", calculate_fuel_part2(&positions))?;
     println!(
@@ -105,7 +108,7 @@ mod tests {
     #[test]
     fn validate_fuel_part1_lazy() {
         let input = read_input(7, true).expect("Invalid data");
-        let positions = parse_input(&input);    
+        let positions = parse_input(&input);
         let result = calculate_fuel_part1_lazy(&positions).expect("Invalid data");
         assert_eq!(result, (37, 2));
     }
@@ -113,15 +116,15 @@ mod tests {
     #[test]
     fn validate_fuel_part1_smart() {
         let input = read_input(7, true).expect("Invalid data");
-        let positions = parse_input(&input);    
+        let positions = parse_input(&input);
         let result = calculate_fuel_part1_smart(&positions).expect("Invalid data");
         assert_eq!(result, (37, 2));
     }
 
     #[test]
-    fn validate_fuel_part2_lazy() {
+    fn validate_fuel_part2() {
         let input = read_input(7, true).expect("Invalid data");
-        let positions = parse_input(&input);    
+        let positions = parse_input(&input);
         let result = calculate_fuel_part2(&positions).expect("Invalid data");
         assert_eq!(result, (168, 5));
     }
