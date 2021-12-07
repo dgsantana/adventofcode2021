@@ -1,22 +1,6 @@
-use std::{
-    collections::HashMap,
-    env::args,
-    fmt::Display,
-    io::{BufRead, BufReader},
-};
+use std::{collections::HashMap, env::args, fmt::Display};
 
-use advent::AdventResult;
-
-const SAMPLE: &str = "0,9 -> 5,9
-8,0 -> 0,8
-9,4 -> 3,4
-2,2 -> 2,1
-7,0 -> 7,4
-6,4 -> 2,0
-0,9 -> 2,9
-3,4 -> 1,4
-0,0 -> 8,8
-5,5 -> 8,2";
+use advent::{read_input, timed_run, AdventResult};
 
 /// Simple point, since it's just u32, we are going to allow Copy and Clone.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -178,47 +162,39 @@ impl Grid {
 }
 
 /// Parses the lines and adds them to the grid.
-/// 
+///
 /// If `orthogonal` is true, only horizontal or vertical lines are check for overlaps.
 /// This is for the first part.
-fn line_parser(input: &[u8], orthogonal: bool) -> Grid {
-    let mut reader = BufReader::new(input);
-    let mut buffer = String::with_capacity(11);
-
+fn parse_input(input: &str, orthogonal: bool) -> Grid {
     let mut grid = Grid::default();
 
-    while let Ok(size) = reader.read_line(&mut buffer) {
-        if size > 0 {
-            let clean_buffer = buffer.trim();
-            let points_str = clean_buffer.split("->");
-            let points = points_str
-                .map(|p| {
-                    p.trim()
-                        .split(',')
-                        .filter_map(|n| n.parse::<u32>().ok())
-                        .collect::<Vec<u32>>()
-                })
-                .filter_map(|p| {
-                    if p.len() != 2 {
-                        None
-                    } else {
-                        Some(Point { x: p[0], y: p[1] })
-                    }
-                })
-                .collect::<Vec<Point>>();
-            if points.len() != 2 {
-                println!("Invalid line '{}'.", &clean_buffer);
-                continue;
-            }
-            let line = LineSegment::new(points[0], points[1]);
-            if orthogonal {
-                grid.insert_line_orthogonal_trace(line);
-            } else {
-                grid.insert_line(line);
-            }
-            buffer.clear();
+    for line in input.lines() {
+        let clean_buffer = line.trim();
+        let points_str = clean_buffer.split("->");
+        let points = points_str
+            .map(|p| {
+                p.trim()
+                    .split(',')
+                    .filter_map(|n| n.parse::<u32>().ok())
+                    .collect::<Vec<u32>>()
+            })
+            .filter_map(|p| {
+                if p.len() != 2 {
+                    None
+                } else {
+                    Some(Point { x: p[0], y: p[1] })
+                }
+            })
+            .collect::<Vec<Point>>();
+        if points.len() != 2 {
+            println!("Invalid line '{}'.", &clean_buffer);
+            continue;
+        }
+        let line = LineSegment::new(points[0], points[1]);
+        if orthogonal {
+            grid.insert_line_orthogonal_trace(line);
         } else {
-            break;
+            grid.insert_line(line);
         }
     }
     grid
@@ -227,14 +203,15 @@ fn line_parser(input: &[u8], orthogonal: bool) -> Grid {
 /// To get a nice diagram for the sample data use the --sample argument
 fn main() -> AdventResult<()> {
     let use_sample = args().any(|arg| arg == "--sample");
-    let input = if use_sample {
-        SAMPLE.as_bytes()
-    } else {
-        include_bytes!("../../day5.txt")
-    };
-
-    let grid = line_parser(input, false);
+    let input = read_input(5, use_sample)?;
+    let grid = timed_run!("Part 1", parse_input(&input, true));
     println!("Grid size: {}x{}", &grid.size.0, &grid.size.1);
+    if use_sample {
+        grid.draw_lines_data();
+        grid.draw_grid();
+    }
+    println!("Overlaps: {}", grid.overlaps());
+    let grid = timed_run!("Part 2", parse_input(&input, false));
     if use_sample {
         grid.draw_lines_data();
         grid.draw_grid();
@@ -245,19 +222,19 @@ fn main() -> AdventResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{line_parser, SAMPLE};
+    use super::*;
 
     #[test]
-    fn validate_overlaps_orthogonal() {
-        let input = SAMPLE.as_bytes();
-        let grid = line_parser(input, true);
+    fn validate_overlaps_part1() {
+        let input = read_input(5, true).expect("Error reading input");
+        let grid = parse_input(&input, true);
         assert_eq!(grid.overlaps(), 5);
     }
 
     #[test]
-    fn validate_overlaps() {
-        let input = SAMPLE.as_bytes();
-        let grid = line_parser(input, false);
+    fn validate_overlaps_part2() {
+        let input = read_input(5, true).expect("Error reading input");
+        let grid = parse_input(&input, false);
         assert_eq!(grid.overlaps(), 12);
     }
 }

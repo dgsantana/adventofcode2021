@@ -1,21 +1,13 @@
-use std::{
-    env::args,
-    io::{BufReader, Read},
-};
+use std::env::args;
 
-use advent::AdventResult;
+use advent::{read_input, AdventResult, timed_run};
 
-const SAMPLE: &str = "3,4,3,1,2";
-
-fn parser(input: &[u8]) -> AdventResult<Vec<u8>> {
-    let mut reader = BufReader::new(input);
-    let mut buffer = String::new();
-    reader.read_to_string(&mut buffer)?;
-    Ok(buffer
+fn parse_input(input: &str) -> Vec<u8> {
+    input
         .trim()
         .split(',')
         .filter_map(|n| n.trim().parse::<u8>().ok())
-        .collect())
+        .collect()
 }
 
 #[allow(dead_code)]
@@ -66,16 +58,12 @@ fn growth(fishes: &[u8], days: usize) -> u64 {
 fn main() -> AdventResult<()> {
     let use_sample = args().any(|arg| arg == "--sample");
     let slow = args().any(|arg| arg == "--slow");
-    let input = if use_sample {
-        SAMPLE.as_bytes()
-    } else {
-        include_bytes!("../../day6.txt")
-    };
-    let lantern_fish = parser(input)?;
+    let input = read_input(6, use_sample)?;
+    let lantern_fish = parse_input(&input);
     let (count, days) = if slow {
-        (growth_lazy(&lantern_fish, 18), 18)
+        timed_run!("Part 1 lazy", (growth_lazy(&lantern_fish, 18), 18))
     } else {
-        (growth(&lantern_fish, 256), 256)
+        timed_run!("Part 2", (growth(&lantern_fish, 256), 256))
     };
     println!("Total of lantern fishes after {} days is {}", days, count);
     Ok(())
@@ -83,18 +71,20 @@ fn main() -> AdventResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{growth, growth_lazy, parser, SAMPLE};
+    use super::*;
 
     #[test]
     fn lazy_growth() {
-        let lantern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
+        let input = read_input(6, true).expect("Error reading input");
+        let lantern_fish = parse_input(&input);
         let count = growth_lazy(&lantern_fish, 80);
         assert_eq!(count, 5934);
     }
 
     #[test]
     fn fast_growth() {
-        let lantern_fish = parser(SAMPLE.as_bytes()).expect("Invalid data.");
+        let input = read_input(6, true).expect("Error reading input");
+        let lantern_fish = parse_input(&input);
         let count = growth(&lantern_fish, 256);
         assert_eq!(count, 26984457539);
     }

@@ -1,28 +1,17 @@
-use std::{
-    env::args,
-    io::{BufRead, BufReader},
-};
+use std::env::args;
 
-use advent::{AdventError, AdventResult};
+use advent::{read_input, timed_run, AdventError, AdventResult};
 
-const SAMPLE: &str = "16,1,2,0,4,2,7,1,2,14";
-
-fn parse(input: &[u8]) -> Vec<u64> {
-    let mut reader = BufReader::new(input);
-    let mut buffer = String::new();
+fn parse_input(input: &str) -> Vec<u64> {
     let mut result = Vec::new();
-    while let Ok(size) = reader.read_line(&mut buffer) {
-        if size == 0 {
-            break;
-        }
-        let clean_buffer = buffer.trim();
+    for line in input.lines() {
+        let clean_buffer = line.trim();
         result.append(
             &mut clean_buffer
                 .split(',')
                 .filter_map(|n| n.trim().parse::<u64>().ok())
                 .collect(),
         );
-        buffer.clear();
     }
     result
 }
@@ -88,25 +77,19 @@ fn calculate_fuel_part2(positions: &[u64]) -> AdventResult<(u64, u64)> {
 fn main() -> AdventResult<()> {
     let use_sample = args().any(|arg| arg == "--sample");
     let slow = args().any(|arg| arg == "--slow");
-    let input = if use_sample {
-        SAMPLE.as_bytes()
-    } else {
-        include_bytes!("../../day7.txt")
-    };
-    let positions = parse(input);
+    let input = read_input(7, use_sample)?;
+    let positions = parse_input(&input);
     let (fuel_cost, best_position) = if slow {
-        calculate_fuel_part1_lazy(&positions)?
+        timed_run!("Part 1", calculate_fuel_part1_lazy(&positions))?
     } else {
-        calculate_fuel_part1_smart(&positions)?
+        timed_run!("Part 1", calculate_fuel_part1_smart(&positions))?
     };
-    println!("Part 1");
     println!(
         "Total fuel cost is {} at position {}",
         fuel_cost, best_position
     );
     println!();
-    println!("Part 2");
-    let (fuel_cost, best_position) = calculate_fuel_part2(&positions)?;
+    let (fuel_cost, best_position) = timed_run!("Part 2", calculate_fuel_part2(&positions))?;
     println!(
         "Total fuel cost is {} at position {}",
         fuel_cost, best_position
@@ -117,27 +100,28 @@ fn main() -> AdventResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        calculate_fuel_part1_lazy, calculate_fuel_part1_smart, calculate_fuel_part2, parse, SAMPLE,
-    };
+    use super::*;
 
     #[test]
     fn validate_fuel_part1_lazy() {
-        let positions = parse(SAMPLE.as_bytes());
+        let input = read_input(7, true).expect("Invalid data");
+        let positions = parse_input(&input);    
         let result = calculate_fuel_part1_lazy(&positions).expect("Invalid data");
         assert_eq!(result, (37, 2));
     }
 
     #[test]
     fn validate_fuel_part1_smart() {
-        let positions = parse(SAMPLE.as_bytes());
+        let input = read_input(7, true).expect("Invalid data");
+        let positions = parse_input(&input);    
         let result = calculate_fuel_part1_smart(&positions).expect("Invalid data");
         assert_eq!(result, (37, 2));
     }
 
     #[test]
     fn validate_fuel_part2_lazy() {
-        let positions = parse(SAMPLE.as_bytes());
+        let input = read_input(7, true).expect("Invalid data");
+        let positions = parse_input(&input);    
         let result = calculate_fuel_part2(&positions).expect("Invalid data");
         assert_eq!(result, (168, 5));
     }

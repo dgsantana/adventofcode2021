@@ -1,6 +1,6 @@
-use std::io::{BufRead, BufReader};
+use std::env::args;
 
-use advent::{AdventError, AdventResult};
+use advent::{read_input, AdventError, AdventResult, timed_run};
 
 #[derive(Debug)]
 enum Command {
@@ -23,30 +23,23 @@ impl Position {
     }
 }
 
-fn command_parser(input: &[u8]) -> AdventResult<Vec<Command>> {
-    let mut input = BufReader::new(input);
-    let mut buffer = String::new();
+fn parse_input(input: &str) -> AdventResult<Vec<Command>> {
     let mut commands = vec![];
 
-    while let Ok(size) = input.read_line(&mut buffer) {
-        if size > 0 {
-            let clean_buffer = buffer.trim();
-            let parts: Vec<_> = clean_buffer.split(' ').collect();
-            if parts.len() != 2 {
-                return Err(AdventError::InvalidData);
-            }
-            let amount = parts[1].parse::<i32>()?;
-            let command = match parts[0] {
-                "forward" => Command::Forward(amount),
-                "down" => Command::Down(amount),
-                "up" => Command::Up(amount),
-                _ => Command::Unknown,
-            };
-            commands.push(command);
-            buffer.clear();
-            continue;
+    for line in input.lines() {
+        let clean_buffer = line.trim();
+        let parts: Vec<_> = clean_buffer.split(' ').collect();
+        if parts.len() != 2 {
+            return Err(AdventError::InvalidData);
         }
-        break;
+        let amount = parts[1].parse::<i32>()?;
+        let command = match parts[0] {
+            "forward" => Command::Forward(amount),
+            "down" => Command::Down(amount),
+            "up" => Command::Up(amount),
+            _ => Command::Unknown,
+        };
+        commands.push(command);
     }
     Ok(commands)
 }
@@ -68,9 +61,10 @@ fn determine_position(commands: &[Command]) -> Position {
 }
 
 fn main() -> AdventResult<()> {
-    let input = include_bytes!("../../day2.txt");
-    let commands = command_parser(input)?;
-    let pos = determine_position(&commands);
+    let use_sample = args().any(|arg| arg == "--sample");
+    let input = read_input(2, use_sample)?;
+    let commands = parse_input(&input)?;
+    let pos = timed_run!("Part 1 and 2", determine_position(&commands));
     println!(
         "Horizontal position is {} and depth is {} with a factor of {}",
         pos.horizontal,
@@ -82,12 +76,12 @@ fn main() -> AdventResult<()> {
 
 #[cfg(test)]
 mod test {
-    use crate::{command_parser, determine_position};
+    use super::*;
 
     #[test]
     fn validate() {
-        let input = b"forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2";
-        let commands = command_parser(input).expect("invalid input data.");
+        let input = read_input(2, true).expect("Invalid data");
+        let commands = parse_input(&input).expect("Invalid data");
         let pos = determine_position(&commands);
         assert_eq!(pos.horizontal, 15);
         assert_eq!(pos.depth, 60);

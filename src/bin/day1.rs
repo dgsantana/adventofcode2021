@@ -1,27 +1,20 @@
-use std::io::{BufRead, BufReader};
+use std::env::args;
 
-use advent::AdventResult;
+use advent::{read_input, timed_run, AdventResult};
 
-fn input_parse(input: &[u8]) -> AdventResult<Vec<i32>> {
-    let mut reader = BufReader::new(input);
-    let mut buf = String::new();
-    let mut input = vec![];
-    while let Ok(size) = reader.read_line(&mut buf) {
-        if size > 0 {
-            let buf = buf.trim();
-            if buf.is_empty() {
-                continue;
-            }
-            input.push(buf.parse::<i32>()?);
-        } else {
-            break;
+fn input_parse(input: &str) -> AdventResult<Vec<i32>> {
+    let mut result = vec![];
+    for line in input.lines() {
+        let buf = line.trim();
+        if buf.is_empty() {
+            continue;
         }
-        buf.clear();
+        result.push(buf.parse::<i32>()?);
     }
-    Ok(input)
+    Ok(result)
 }
 
-fn part_one(measurements: &[i32]) -> i32 {
+fn part_one(measurements: &[i32]) -> (i32, usize) {
     let mut last = measurements[0];
     let mut counter = 0;
     for current in measurements.iter().skip(1) {
@@ -30,15 +23,10 @@ fn part_one(measurements: &[i32]) -> i32 {
         }
         last = *current;
     }
-    println!(
-        "There are {} measurements that are larger then the previous measurement on a total of {}.",
-        counter,
-        measurements.len()
-    );
-    counter
+    (counter, measurements.len())
 }
 
-fn part_two(measurements: &[i32]) -> i32 {
+fn part_two(measurements: &[i32]) -> (i32, usize) {
     let mut last = measurements.iter().take(3).sum();
     let mut counter = 0;
     for current in measurements
@@ -53,41 +41,46 @@ fn part_two(measurements: &[i32]) -> i32 {
         }
         last = current;
     }
-    println!(
-        "There are {} triplets measurements that are larger then the previous measurement on a total of {}.",
-        counter,
-        measurements.len()
-    );
-
-    counter
+    (counter, measurements.len())
 }
 
 fn main() -> AdventResult<()> {
     println!("Advent of Code 2021! Rust edition. Day 1");
-    let input = include_bytes!("../../day1.txt");
-    let measurements = input_parse(input)?;
-    part_one(&measurements);
-    part_two(&measurements);
+    let use_sample = args().any(|arg| arg == "--sample");
+    let input = read_input(1, use_sample)?;
+    let data = input_parse(&input)?;
+    let (count, amount) = timed_run!("Part 1", part_one(&data));
+    println!(
+        "There are {} measurements that are larger then the previous measurement on a total of {}.",
+        count, amount
+    );
+
+    let (count, amount) = timed_run!("Part 2", part_two(&data));
+    println!(
+        "There are {} triplets measurements that are larger then the previous measurement on a total of {}.",
+        count,
+        amount
+    );
     Ok(())
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{input_parse, part_one, part_two};
+    use super::*;
 
     #[test]
     fn validate_part_one() {
-        let input = b"199\n200\n208\n210\n200\n207\n240\n269\n260\n263";
-        let measurements = input_parse(input).expect("invalid data");
-        let counter = part_one(&measurements);
+        let input = read_input(1, true).expect("Invalid data");
+        let measurements = input_parse(&input).expect("invalid data");
+        let (counter, _) = part_one(&measurements);
         assert_eq!(counter, 7);
     }
 
     #[test]
     fn validate_part_two() {
-        let input = b"199\n200\n208\n210\n200\n207\n240\n269\n260\n263";
-        let measurements = input_parse(input).expect("invalid data");
-        let counter = part_two(&measurements);
+        let input = read_input(1, true).expect("Invalid data");
+        let measurements = input_parse(&input).expect("invalid data");
+        let (counter, _) = part_two(&measurements);
         assert_eq!(counter, 5);
     }
 }
