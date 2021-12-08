@@ -24,8 +24,7 @@ impl SegmentDisplay {
         let mut result = 0;
         let size = self.output.len() as u32 - 1;
         for (index, digit) in self.output.iter().enumerate() {
-            let number = self.digit(digit, false);
-            if let Some(n) = number {
+            if let Some(n) = self.digit(digit) {
                 result += n as u64 * 10_u64.pow(size - index as u32);
             }
         }
@@ -48,32 +47,22 @@ impl SegmentDisplay {
             .map_or(vec![], |x| x.clone())
     }
 
-    fn digit_9(&self) -> Vec<char> {
-        self.all_digits()
-            .find(|x| self.digit(x, true) == Some(9))
-            .map_or(vec![], |x| x.clone())
-    }
-
-    fn digit(&self, digit: &[char], ignore: bool) -> Option<u32> {
+    fn digit(&self, digit: &[char]) -> Option<u32> {
         match digit.len() {
             2 => Some(1),
             3 => Some(7),
             4 => Some(4),
             5 => {
                 // Can be 2, 3 or 5
-                if ignore {
-                    None
-                } else if digit_includes(digit, &self.digit_1()) {
+                if digit_includes(digit, &self.digit_1()) {
                     Some(3)
                 } else {
-                    // All of the 5 segments are in the 9 the same isn't true for 2
-                    let nine_segments = self.digit_9();
-                    for c in digit {
-                        if !nine_segments.contains(c) {
-                            return Some(2);
-                        }
+                    let digit_bd = digit_xor(&self.digit_4(), &self.digit_1());
+                    if digit_includes(digit, &digit_bd) {
+                        Some(5)
+                    } else {
+                        Some(2)
                     }
-                    Some(5)
                 }
             }
             6 => {
@@ -96,6 +85,14 @@ impl SegmentDisplay {
 
 fn digit_includes(digit: &[char], base: &[char]) -> bool {
     base.iter().all(|&x| digit.contains(&x))
+}
+
+fn digit_xor(digit: &[char], base: &[char]) -> Vec<char> {
+    digit
+        .iter()
+        .filter(|&x| !base.contains(x))
+        .cloned()
+        .collect()
 }
 
 fn parse_input(input: &str) -> AdventResult<Vec<SegmentDisplay>> {
