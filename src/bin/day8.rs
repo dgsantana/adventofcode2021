@@ -8,12 +8,12 @@ const NUMBERS: [&str; 10] = [
 
 #[derive(Debug, Default)]
 struct SegmentDisplay {
-    input: Vec<Vec<char>>,
-    output: Vec<Vec<char>>,
+    input: Vec<Vec<u8>>,
+    output: Vec<Vec<u8>>,
 }
 
 impl SegmentDisplay {
-    fn new(input_numbers: Vec<Vec<char>>, output_numbers: Vec<Vec<char>>) -> Self {
+    fn new(input_numbers: Vec<Vec<u8>>, output_numbers: Vec<Vec<u8>>) -> Self {
         Self {
             input: input_numbers,
             output: output_numbers,
@@ -31,23 +31,23 @@ impl SegmentDisplay {
         result
     }
 
-    fn all_digits(&self) -> impl Iterator<Item = &Vec<char>> {
+    fn all_digits(&self) -> impl Iterator<Item = &Vec<u8>> {
         self.input.iter().chain(self.output.iter())
     }
 
-    fn digit_1(&self) -> Vec<char> {
+    fn digit_1(&self) -> Vec<u8> {
         self.all_digits()
             .find(|x| x.len() == 2)
             .map_or(vec![], |x| x.clone())
     }
 
-    fn digit_4(&self) -> Vec<char> {
+    fn digit_4(&self) -> Vec<u8> {
         self.all_digits()
             .find(|x| x.len() == 4)
             .map_or(vec![], |x| x.clone())
     }
 
-    fn digit(&self, digit: &[char]) -> Option<u32> {
+    fn digit(&self, digit: &[u8]) -> Option<u32> {
         match digit.len() {
             2 => Some(1),
             3 => Some(7),
@@ -83,11 +83,11 @@ impl SegmentDisplay {
     }
 }
 
-fn digit_includes(digit: &[char], base: &[char]) -> bool {
+fn digit_includes(digit: &[u8], base: &[u8]) -> bool {
     base.iter().all(|&x| digit.contains(&x))
 }
 
-fn digit_xor(digit: &[char], base: &[char]) -> Vec<char> {
+fn digit_xor(digit: &[u8], base: &[u8]) -> Vec<u8> {
     digit
         .iter()
         .filter(|&x| !base.contains(x))
@@ -101,12 +101,12 @@ fn parse_input(input: &str) -> AdventResult<Vec<SegmentDisplay>> {
         let (input_part, output_part) = line.split_once('|').ok_or(AdventError::InvalidData)?;
         let input_numbers = input_part
             .split_whitespace()
-            .map(|n| n.chars().collect())
+            .map(|n| n.bytes().collect())
             .collect();
 
         let output_numbers = output_part
             .split_whitespace()
-            .map(|n| n.chars().collect())
+            .map(|n| n.bytes().collect())
             .collect();
         result.push(SegmentDisplay::new(input_numbers, output_numbers));
     }
