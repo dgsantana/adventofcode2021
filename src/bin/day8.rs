@@ -2,6 +2,8 @@ use std::env::args;
 
 use advent::{read_input, timed_run, AdventError, AdventResult};
 
+/// Just for reference
+#[allow(dead_code)]
 const NUMBERS: [&str; 10] = [
     "abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg",
 ];
@@ -32,13 +34,15 @@ impl SegmentDisplay {
     }
 
     fn digit_1(&self) -> Vec<u8> {
-        self.input.iter()
+        self.input
+            .iter()
             .find(|x| x.len() == 2)
             .map_or(vec![], |x| x.clone())
     }
 
     fn digit_4(&self) -> Vec<u8> {
-        self.input.iter()
+        self.input
+            .iter()
             .find(|x| x.len() == 4)
             .map_or(vec![], |x| x.clone())
     }
@@ -110,18 +114,13 @@ fn parse_input(input: &str) -> AdventResult<Vec<SegmentDisplay>> {
 }
 
 fn solve_part1(segment_display: &mut [SegmentDisplay]) -> AdventResult<usize> {
-    let search_pattern = [
-        NUMBERS[1].len(),
-        NUMBERS[4].len(),
-        NUMBERS[7].len(),
-        NUMBERS[8].len(),
-    ];
+    const LENS: [usize; 4] = [2, 4, 3, 7];
     let mut count = 0;
     for segment_number in segment_display.iter() {
         count += segment_number
             .output
             .iter()
-            .filter(|x| search_pattern.contains(&x.len()))
+            .filter(|x| LENS.contains(&x.len()))
             .count();
     }
     Ok(count)
