@@ -10,6 +10,9 @@ pub enum AdventError {
     IoError(#[from] std::io::Error),
     #[error(transparent)]
     IntParseError(#[from] std::num::ParseIntError),
+    #[error(transparent)]
+    Utf8Error(#[from] std::string::FromUtf8Error),
+
 }
 
 pub type AdventResult<T> = Result<T, AdventError>;
