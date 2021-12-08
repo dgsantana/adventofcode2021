@@ -31,18 +31,14 @@ impl SegmentDisplay {
         result
     }
 
-    fn all_digits(&self) -> impl Iterator<Item = &Vec<u8>> {
-        self.input.iter().chain(self.output.iter())
-    }
-
     fn digit_1(&self) -> Vec<u8> {
-        self.all_digits()
+        self.input.iter()
             .find(|x| x.len() == 2)
             .map_or(vec![], |x| x.clone())
     }
 
     fn digit_4(&self) -> Vec<u8> {
-        self.all_digits()
+        self.input.iter()
             .find(|x| x.len() == 4)
             .map_or(vec![], |x| x.clone())
     }
