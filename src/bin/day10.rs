@@ -69,8 +69,6 @@ fn parse_part_1(input: &str) -> (u32, u64) {
         }
     }
     fix_points.sort_unstable();
-    dbg!(&fix_points);
-    dbg!(&fix_points.len());
     let mid = fix_points.len() / 2;
     (error_points, fix_points[mid])
 }
