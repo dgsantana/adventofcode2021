@@ -50,6 +50,9 @@ impl Grid {
         counter
     }
 
+    /// Loop until all the octopus flash
+    /// `steps` is used for debugging and requires feature `info_prints` to show something
+    #[allow(unused_variables)]
     fn part_2(&mut self, steps: &[usize]) -> usize {
         let mut step = 0;
         loop {
@@ -63,7 +66,8 @@ impl Grid {
                     self.iterate_octopus(x, y, &mut flashed);
                 }
             }
-            // #[cfg(feature = "info_prints")]
+            
+            #[cfg(feature = "info_prints")]
             if steps.contains(&step) {
                 for (y, line) in self.data.chunks(self.width as usize).enumerate() {
                     for (x, byte) in line.iter().enumerate() {
