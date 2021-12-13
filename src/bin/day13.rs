@@ -79,7 +79,11 @@ fn main() -> AdventResult<()> {
     let input = read_input(13, use_sample)?;
     let (mut data, folds) = parse_input(&input);
     let first = folds.first().unwrap();
+    #[cfg(feature="info_prints")]
+    display(&data, Some(first));
     let count = timed_run!("Part 1", first.fold(&mut data));
+    #[cfg(feature="info_prints")]
+    display(&data, Some(first));
     println!("Number of unique dots: {}", count);
     timed_run!("Part 2", {
         for fold in folds.iter().skip(1) {
@@ -101,7 +105,7 @@ fn display(data: &[(u32, u32)], fold: Option<&Fold>) {
     for y in 0..=max_y {
         if let Some(Fold::Y(pos)) = fold {
             if *pos == y {
-                println!("{}", "-".repeat(max_x as usize));
+                println!("{}", "\x1B[38;5;1m\u{2588}\x1B[0m".repeat(max_x as usize + 1));
                 continue;
             }
         }
