@@ -17,8 +17,8 @@ pub enum AdventError {
 
 pub type AdventResult<T> = Result<T, AdventError>;
 
-pub fn read_input(day: u8, is_sample: bool) -> AdventResult<String> {
-    let path = if is_sample {
+pub fn read_input(day: u8, use_sample: bool) -> AdventResult<String> {
+    let path = if use_sample {
         format!("inputs/day{}_sample.txt", day)
     } else {
         format!("inputs/day{}.txt", day)
