@@ -132,9 +132,4 @@ mod tests {
         let first = folds.first().unwrap();
         assert_eq!(first.fold(&mut data), 17);
     }
-
-    #[test]
-    fn validate_part2() {
-        let input = read_input(13, true).unwrap();
-    }
 }
