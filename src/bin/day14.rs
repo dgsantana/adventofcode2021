@@ -43,11 +43,12 @@ impl<'a> Synthesis<'a> {
     }
 
     /// Smarter grow  
-    /// The main drawback is that we can't get the produced chain
+    /// The main drawback is that we can't get the produced chain order
     /// we only get the number of pairs, but it is very efficient.
     fn grow(&self, cycles: usize) -> usize {
         let mut counter = HashMap::<u8, usize>::new();
         let mut chain = HashMap::<(u8, u8), usize>::new();
+        let mut pairs = Vec::new();
 
         // Count our input template
         for b in self.template.bytes() {
@@ -61,7 +62,7 @@ impl<'a> Synthesis<'a> {
 
         // Drain keeps the current capacity, so we have a constant alloc.
         for _ in 0..cycles {
-            let pairs: Vec<_> = chain.drain().filter(|(_, count)| *count > 0).collect();
+            pairs.extend(chain.drain().filter(|(_, count)| *count > 0));
             for (pair, pair_count) in pairs.iter() {
                 if *pair_count > 0 {
                     if let Some(&element) = self.rules.get(pair) {
@@ -71,6 +72,8 @@ impl<'a> Synthesis<'a> {
                     }
                 }
             }
+            // Clear also keeps the current capacity so we avoid extra allocations from the extend.
+            pairs.clear();
         }
         let min = counter.values().min().unwrap();
         let max = counter.values().max().unwrap();
