@@ -56,8 +56,8 @@ fn parse_input(input: &str) -> (Vec<(u32, u32)>, Vec<Fold>) {
             if let Some(fold) = line.split_ascii_whitespace().last() {
                 let parts = fold.split('=').collect::<Vec<&str>>();
                 match parts[0] {
-                    "x" => folds.push(Fold::X(parts[1].parse::<u32>().unwrap_or_default())),
-                    "y" => folds.push(Fold::Y(parts[1].parse::<u32>().unwrap_or_default())),
+                    "x" => folds.push(Fold::X(parts[1].parse::<u32>().unwrap())),
+                    "y" => folds.push(Fold::Y(parts[1].parse::<u32>().unwrap())),
                     _ => (),
                 }
             }
